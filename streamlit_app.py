@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import math
 from pathlib import Path
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import altair as alt
 
 # Set the page title and icon
 st.set_page_config(
@@ -52,4 +56,6 @@ scatter = alt.Chart(plot_data).mark_circle(size=60).encode(
 ).interactive()
 
 st.altair_chart(scatter, use_container_width=True)
+
+
 
