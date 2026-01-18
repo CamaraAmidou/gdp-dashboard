@@ -111,5 +111,5 @@ if prediction == 1:
 else:
     st.success("✅ Prediction: NO heart attack or stroke")
 
-else:
-    st.info("Train the model first.")
+#else:
+    #st.info("Train the model first.")
