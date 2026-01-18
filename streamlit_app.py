@@ -22,7 +22,7 @@ def load_data():
 df = load_data()
 
 # ---------------- SAFE DATA PREVIEW ----------------
-with st.expander("📂 Preview Dataset (first 500 rows only)"):
+with st.expander("Preview Dataset (first 500 rows only)"):
     st.dataframe(df.head(500), use_container_width=True)
 
 # ---------------- PREPARE DATA ----------------
@@ -37,7 +37,7 @@ X = X.fillna(X.median())
 y = df["heart_attack_or_stroke_occurred"]
 
 # ---------------- SAFE SCATTER PLOT ----------------
-st.subheader("📈 Feature Scatter Plot")
+st.subheader("Feature Scatter Plot")
 
 if st.checkbox("Show scatter plot (sampled data)"):
     sample_df = X.sample(min(500, len(X)), random_state=42)
@@ -55,11 +55,11 @@ if st.checkbox("Show scatter plot (sampled data)"):
     st.altair_chart(chart, width="stretch")
 
 # ---------------- MODEL TRAINING ----------------
-st.subheader("🤖 Model Training")
+st.subheader("Model Training")
 
 with st.form("train_form"):
     test_size = st.slider("Test set size (%)", 10, 50, 20)
-    train_btn = st.form_submit_button("🚀 Train Model")
+    train_btn = st.form_submit_button("Train Model")
 
 @st.cache_resource
 def train_model(X, y, test_size):
@@ -83,7 +83,7 @@ if train_btn:
     with st.spinner("Training model..."):
         model, y_test, preds = train_model(X, y, test_size)
 
-    st.success("✅ Training complete")
+    st.success("Training complete")
     st.metric("Accuracy", f"{accuracy_score(y_test, preds):.2f}")
 
     st.write("### Confusion Matrix")
@@ -96,7 +96,7 @@ if train_btn:
     st.session_state.model = model
 
 # ---------------- PREDICTION ----------------
-st.subheader("🔮 Make a Prediction")
+st.subheader("Make a Prediction")
 
 if "model" in st.session_state:
     # Collect user inputs for all features
@@ -111,8 +111,8 @@ if "model" in st.session_state:
 
         # Map numeric prediction to human-readable label
         if prediction == 1:
-            st.error("⚠️ Prediction: HAS heart attack or stroke")
+            st.error("Prediction: HAS heart attack or stroke")
         else:
-            st.success("✅ Prediction: NO heart attack or stroke")
+            st.success("Prediction: NO heart attack or stroke")
 else:
-    st.info("ℹ️ Train the model first to enable predictions.")
+    st.info("Train the model first to enable predictions.")
