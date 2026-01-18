@@ -30,3 +30,26 @@ with st.expander("View Features (X)"):
 # Show target in an expander
 with st.expander("View Target (Y)"):
     st.dataframe(Y)
+    
+    # Scatter plot section
+st.write("## Scatter Plot of Features")
+
+# Let user select features for x and y axes
+feature_options = X.columns.tolist()
+x_feature = st.selectbox("Select X-axis feature", feature_options)
+y_feature = st.selectbox("Select Y-axis feature", feature_options)
+
+# Combine X and Y for plotting
+plot_data = X.copy()
+plot_data['Target'] = Y
+
+# Create scatter plot
+scatter = alt.Chart(plot_data).mark_circle(size=60).encode(
+    x=x_feature,
+    y=y_feature,
+    color='Target:N',  # Treat target as categorical
+    tooltip=list(plot_data.columns)
+).interactive()
+
+st.altair_chart(scatter, use_container_width=True)
+
