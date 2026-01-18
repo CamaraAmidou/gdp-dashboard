@@ -24,8 +24,14 @@ with st.expander("View data"):
 #st.write(raw_data)
 
 # Split features and target
-X = raw_data.drop("heart_attack_or_stroke_occurred", axis=1)
+# Drop non-numeric columns
+X = raw_data.drop(
+    columns=["heart_attack_or_stroke_occurred", "patient_id"],
+    errors="ignore"
+)
+
 Y = raw_data["heart_attack_or_stroke_occurred"]
+
 
 # Show features in an expander
 with st.expander("View Features (X)"):
