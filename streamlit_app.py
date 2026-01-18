@@ -14,10 +14,10 @@ with st.expander("View data"):
 raw_data = pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
 st.write(raw_data)
 
-  st.write("X") 
+  st.write("**X**") 
   x = df.drop("heart_attack_or_stroke_occurred", axis = 1)
   x
-  st.write("Y")
+  st.write("**Y**")
   y = df.heart_attack_or_stroke_occurred
   y
   
