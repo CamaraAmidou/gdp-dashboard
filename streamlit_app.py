@@ -8,11 +8,11 @@ st.set_page_config(
     page_title='Ai project with Babucarr',
     page_icon=':earth_africa:',
 )
-raw_data = pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
-st.write(raw_data)
-
 with st.expander("View data"):
   df.dataframe(raw_data)
+    
+raw_data = pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
+st.write(raw_data)
 
   st.write("X") 
   x = df.drop("heart_attack_or_stroke_occurred", axis = 1)
