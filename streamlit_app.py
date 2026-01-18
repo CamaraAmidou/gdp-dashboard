@@ -16,14 +16,17 @@ raw_data = pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
 with st.expander("View data"):
     st.dataframe(raw_data)
 
-# Display the full dataset outside of expander (optional)
+# Display the full dataset outside of expander 
 st.write(raw_data)
 
 # Split features and target
-st.write("**X (Features)**")
 X = raw_data.drop("heart_attack_or_stroke_occurred", axis=1)
-st.dataframe(X)
-
-st.write("**Y (Target)**")
 Y = raw_data["heart_attack_or_stroke_occurred"]
-st.dataframe(Y)
+
+# Show features in an expander
+with st.expander("View Features (X)"):
+    st.dataframe(X)
+
+# Show target in an expander
+with st.expander("View Target (Y)"):
+    st.dataframe(Y)
