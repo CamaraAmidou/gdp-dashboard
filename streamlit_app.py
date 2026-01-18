@@ -10,7 +10,8 @@ st.set_page_config(
 )
 
 df = pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
-st.write(df)
+     st.write(df)
+
 with st.expander("View data"):
     st.dataframe(df)
     
