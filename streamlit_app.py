@@ -81,7 +81,7 @@ st.write(confusion_matrix(Y_test, Y_pred))
 st.write("**Classification Report:**")
 st.text(classification_report(Y_test, Y_pred))
 
-# Optional: Make predictions from user input
+# Make predictions from user input
 st.write("## Make a Prediction")
 user_input = {}
 for col in X.columns:
