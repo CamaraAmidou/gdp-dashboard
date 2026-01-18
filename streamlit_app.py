@@ -26,6 +26,13 @@ with st.expander("📂 Preview Dataset (first 500 rows only)"):
 
 # ---------------- PREPARE DATA ----------------
 X = df.drop(columns=["heart_attack_or_stroke_occurred", "patient_id"], errors="ignore")
+
+# Keep only numeric columns
+X = X.select_dtypes(include=["int64", "float64"])
+
+# Handle missing values
+X = X.fillna(X.median())
+
 y = df["heart_attack_or_stroke_occurred"]
 
 # ---------------- SAFE SCATTER PLOT ----------------
