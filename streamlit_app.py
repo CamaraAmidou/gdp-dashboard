@@ -5,67 +5,58 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import altair as alt
 
-# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="AI Project with Babucarr",
     page_icon="🌍",
     layout="wide"
 )
 
-st.title("Cardiovascular Risk Prediction App")
+st.title("Cardiovascular Risk Prediction")
 
-# ---------------- CACHE DATA ----------------
+# ---------------- DATA LOADING ----------------
 @st.cache_data
 def load_data():
     return pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
 
-raw_data = load_data()
+df = load_data()
 
-# ---------------- VIEW DATA ----------------
-with st.expander("View Raw Dataset"):
-    st.dataframe(raw_data, use_container_width=True)
+# ---------------- SAFE DATA PREVIEW ----------------
+with st.expander("📂 Preview Dataset (first 500 rows only)"):
+    st.dataframe(df.head(500), use_container_width=True)
 
 # ---------------- PREPARE DATA ----------------
-X = raw_data.drop(
-    columns=["heart_attack_or_stroke_occurred", "patient_id"],
-    errors="ignore"
-)
-Y = raw_data["heart_attack_or_stroke_occurred"]
+X = df.drop(columns=["heart_attack_or_stroke_occurred", "patient_id"], errors="ignore")
+y = df["heart_attack_or_stroke_occurred"]
 
-with st.expander("View Features (X)"):
-    st.dataframe(X, use_container_width=True)
+# ---------------- SAFE SCATTER PLOT ----------------
+st.subheader("📈 Feature Scatter Plot")
 
-with st.expander("View Target (Y)"):
-    st.dataframe(Y, use_container_width=True)
+if st.checkbox("Show scatter plot (sampled data)"):
+    sample_df = X.sample(min(500, len(X)), random_state=42)
+    sample_df["Target"] = y.loc[sample_df.index].astype(str)
 
-# ---------------- SCATTER PLOT ----------------
-st.subheader("Feature Scatter Plot")
+    x_feature = st.selectbox("X-axis", X.columns)
+    y_feature = st.selectbox("Y-axis", X.columns)
 
-feature_options = X.columns.tolist()
-x_feature = st.selectbox("Select X-axis feature", feature_options)
-y_feature = st.selectbox("Select Y-axis feature", feature_options)
+    chart = alt.Chart(sample_df).mark_circle(size=50).encode(
+        x=x_feature,
+        y=y_feature,
+        color="Target:N"
+    ).interactive()
 
-plot_data = X.copy()
-plot_data["Target"] = Y.astype(str)
-
-scatter = alt.Chart(plot_data).mark_circle(size=60).encode(
-    x=x_feature,
-    y=y_feature,
-    color="Target:N",
-    tooltip=list(plot_data.columns)
-).interactive()
-
-st.altair_chart(scatter, width="stretch")
+    st.altair_chart(chart, width="stretch")
 
 # ---------------- MODEL TRAINING ----------------
-st.subheader("Gradient Boosting Model Training")
+st.subheader("🤖 Model Training")
 
-test_size = st.slider("Test set size (%)", 10, 50, 20)
+with st.form("train_form"):
+    test_size = st.slider("Test set size (%)", 10, 50, 20)
+    train_btn = st.form_submit_button("🚀 Train Model")
 
 @st.cache_resource
-def train_model(X, Y, test_size):
-    X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, test_size=test_size / 100, random_state=42
+def train_model(X, y, test_size):
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size / 100, random_state=42
     )
 
     model = GradientBoostingClassifier(
@@ -75,42 +66,38 @@ def train_model(X, Y, test_size):
         random_state=42
     )
 
-    model.fit(X_train, Y_train)
-    Y_pred = model.predict(X_test)
+    model.fit(X_train, y_train)
+    preds = model.predict(X_test)
 
-    return model, X_test, Y_test, Y_pred
+    return model, y_test, preds
 
-if st.button("Train Model"):
-    with st.spinner("Training model... Please wait"):
-        model, X_test, Y_test, Y_pred = train_model(X, Y, test_size)
+if train_btn:
+    with st.spinner("Training model..."):
+        model, y_test, preds = train_model(X, y, test_size)
 
-    accuracy = accuracy_score(Y_test, Y_pred)
-    st.success("Model trained successfully!")
+    st.success("Training complete")
+    st.metric("Accuracy", f"{accuracy_score(y_test, preds):.2f}")
 
-    st.metric("Accuracy", f"{accuracy:.2f}")
+    st.write("Confusion Matrix")
+    st.dataframe(confusion_matrix(y_test, preds))
 
-    st.write("### Confusion Matrix")
-    st.dataframe(confusion_matrix(Y_test, Y_pred))
+    st.write("Classification Report")
+    st.text(classification_report(y_test, preds))
 
-    st.write("### Classification Report")
-    st.text(classification_report(Y_test, Y_pred))
-
-    st.session_state["model"] = model
+    st.session_state.model = model
 
 # ---------------- PREDICTION ----------------
-st.subheader("Make a Prediction")
+st.subheader("🔮 Prediction")
 
-if "model" not in st.session_state:
-    st.info("Train the model first to enable predictions.")
-else:
-    user_input = {}
-    for col in X.columns:
-        user_input[col] = st.number_input(
-            f"{col}",
-            value=float(X[col].mean())
-        )
+if "model" in st.session_state:
+    inputs = {
+        col: st.number_input(col, float(X[col].mean()))
+        for col in X.columns
+    }
 
     if st.button("Predict"):
-        user_df = pd.DataFrame([user_input])
-        prediction = st.session_state["model"].predict(user_df)[0]
-        st.success(f"Predicted Heart Attack or Stroke: **{prediction}**")
+        user_df = pd.DataFrame([inputs])
+        result = st.session_state.model.predict(user_df)[0]
+        st.success(f"Prediction: {result}")
+else:
+    st.info("Train the model first.")
