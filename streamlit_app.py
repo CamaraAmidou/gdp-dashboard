@@ -10,8 +10,8 @@ st.set_page_config(
 )
 st.write(raw_data)
 with st.expander("View data"):
-df = pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
-st.dataframe(df)
+  df = pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
+
 
 
     
