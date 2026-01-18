@@ -104,7 +104,12 @@ if "model" in st.session_state:
 
     if st.button("Predict"):
         user_df = pd.DataFrame([inputs])
-        result = st.session_state.model.predict(user_df)[0]
-        st.success(f"Prediction: {result}")
+        #result = prediction = st.session_state.model.predict(user_df)[0]
+
+if prediction == 1:
+    st.error("⚠️ Prediction: HAS heart attack or stroke")
+else:
+    st.success("✅ Prediction: NO heart attack or stroke")
+
 else:
     st.info("Train the model first.")
