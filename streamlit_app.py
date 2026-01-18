@@ -5,13 +5,14 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import altair as alt
 
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="AI Project with Babucarr",
     page_icon="🌍",
     layout="wide"
 )
 
-st.title("Cardiovascular Risk Prediction")
+st.title("Cardiovascular Risk Prediction App")
 
 # ---------------- DATA LOADING ----------------
 @st.cache_data
@@ -42,8 +43,8 @@ if st.checkbox("Show scatter plot (sampled data)"):
     sample_df = X.sample(min(500, len(X)), random_state=42)
     sample_df["Target"] = y.loc[sample_df.index].astype(str)
 
-    x_feature = st.selectbox("X-axis", X.columns)
-    y_feature = st.selectbox("Y-axis", X.columns)
+    x_feature = st.selectbox("Select X-axis feature", X.columns)
+    y_feature = st.selectbox("Select Y-axis feature", X.columns)
 
     chart = alt.Chart(sample_df).mark_circle(size=50).encode(
         x=x_feature,
@@ -82,32 +83,36 @@ if train_btn:
     with st.spinner("Training model..."):
         model, y_test, preds = train_model(X, y, test_size)
 
-    st.success("Training complete")
+    st.success("✅ Training complete")
     st.metric("Accuracy", f"{accuracy_score(y_test, preds):.2f}")
 
-    st.write("Confusion Matrix")
+    st.write("### Confusion Matrix")
     st.dataframe(confusion_matrix(y_test, preds))
 
-    st.write("Classification Report")
+    st.write("### Classification Report")
     st.text(classification_report(y_test, preds))
 
+    # Save model in session state for prediction
     st.session_state.model = model
 
 # ---------------- PREDICTION ----------------
-st.subheader("🔮 Prediction")
+st.subheader("🔮 Make a Prediction")
 
 if "model" in st.session_state:
+    # Collect user inputs for all features
     inputs = {
         col: st.number_input(col, float(X[col].mean()))
         for col in X.columns
     }
 
     if st.button("Predict"):
-       user_df = pd.DataFrame([inputs])
+        user_df = pd.DataFrame([inputs])
+        prediction = st.session_state.model.predict(user_df)[0]
 
-       prediction = st.session_state.model.predict(user_df)[0]
-
-       if prediction == 1:
-          st.error("⚠️ Prediction: HAS heart attack or stroke")
-      else:
-          st.success("✅ Prediction: NO heart attack or stroke")
+        # Map numeric prediction to human-readable label
+        if prediction == 1:
+            st.error("⚠️ Prediction: HAS heart attack or stroke")
+        else:
+            st.success("✅ Prediction: NO heart attack or stroke")
+else:
+    st.info("ℹ️ Train the model first to enable predictions.")
