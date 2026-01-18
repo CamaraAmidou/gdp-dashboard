@@ -17,7 +17,7 @@ with st.expander("View data"):
     st.dataframe(raw_data)
 
 # Display the full dataset outside of expander 
-st.write(raw_data)
+#st.write(raw_data)
 
 # Split features and target
 X = raw_data.drop("heart_attack_or_stroke_occurred", axis=1)
