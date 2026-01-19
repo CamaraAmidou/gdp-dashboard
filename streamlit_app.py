@@ -5,7 +5,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import altair as alt
 
-# ---------------- PAGE CONFIG ----------------
+#  PAGE CONFIG 
 st.set_page_config(
     page_title="AI Project with Babucarr",
     page_icon="🌍",
@@ -14,18 +14,18 @@ st.set_page_config(
 
 st.title("Cardiovascular Risk Prediction App")
 
-# ---------------- DATA LOADING ----------------
+#DATA LOADING
 @st.cache_data
 def load_data():
     return pd.read_csv("cvd_synthetic_dataset_v0.2.csv")
 
 df = load_data()
 
-# ---------------- SAFE DATA PREVIEW ----------------
+# SAFE DATA PREVIEW 
 with st.expander("Preview Dataset (first 500 rows only)"):
     st.dataframe(df.head(500), use_container_width=True)
 
-# ---------------- PREPARE DATA ----------------
+#  PREPARE DATA
 X = df.drop(columns=["heart_attack_or_stroke_occurred", "patient_id"], errors="ignore")
 
 # Keep only numeric columns
@@ -36,7 +36,7 @@ X = X.fillna(X.median())
 
 y = df["heart_attack_or_stroke_occurred"]
 
-# ---------------- SAFE SCATTER PLOT ----------------
+#  SAFE SCATTER PLOT 
 st.subheader("Feature Scatter Plot")
 
 if st.checkbox("Show scatter plot (sampled data)"):
@@ -54,7 +54,7 @@ if st.checkbox("Show scatter plot (sampled data)"):
 
     st.altair_chart(chart, width="stretch")
 
-# ---------------- MODEL TRAINING ----------------
+#  MODEL TRAINING 
 st.subheader("Model Training")
 
 with st.form("train_form"):
@@ -95,7 +95,7 @@ if train_btn:
     # Save model in session state for prediction
     st.session_state.model = model
 
-# ---------------- PREDICTION ----------------
+# PREDICTION 
 st.subheader("Make a Prediction")
 
 if "model" in st.session_state:
